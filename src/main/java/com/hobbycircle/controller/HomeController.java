@@ -1,8 +1,10 @@
 package com.hobbycircle.controller;
 
-import com.hobbycircle.Constants;
+import com.hobbycircle.common.Constants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -25,7 +27,12 @@ public class HomeController {
      * @return
      */
     @RequestMapping("/home")
-    public String home() {
+    public String home(HttpServletRequest request) {
+        Object value = request.getSession().getAttribute(Constants.SESSION_AUTH_KEY);
+        if (value == null) {
+            return "redirect:/";
+        }
+
         return Constants.HOME_PAGE_VIEW_NAME;
     }
 }
