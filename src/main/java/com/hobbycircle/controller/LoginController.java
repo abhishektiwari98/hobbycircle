@@ -16,9 +16,9 @@ public class LoginController {
                         @RequestParam(name = "email") String email,
                         @RequestParam(name = "pwd") String password) {
         if (VALID_EMAIL.equals(email) && VALID_PASSWORD.equals(password)) {
-            return Constants.HOME_PAGE_VIEW_NAME;
+            return "redirect:/home";
         } else {
-            return Constants.INDEX_PAGE_VIEW_NAME;
+            return "redirect:/";
         }
     }
 }
