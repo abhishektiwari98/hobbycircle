@@ -12,12 +12,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class HomeController {
-
     /**
      * Handles guest users, who visit the home page.
      * @return
      */
-    @RequestMapping("/")
+    @RequestMapping(Constants.INDEX_ENDPOINT)
     public String index() {
         return Constants.INDEX_PAGE_VIEW_NAME;
     }
@@ -26,11 +25,11 @@ public class HomeController {
      * Handles authenticated/logged-in users.
      * @return
      */
-    @RequestMapping("/home")
+    @RequestMapping(Constants.HOME_ENDPOINT)
     public String home(HttpServletRequest request) {
         Object value = request.getSession().getAttribute(Constants.SESSION_AUTH_KEY);
         if (value == null) {
-            return "redirect:/";
+            return Constants.INDEX_REDIRECT;
         }
 
         return Constants.HOME_PAGE_VIEW_NAME;

@@ -15,7 +15,7 @@ public class SignupController {
     @Autowired
     InMemoryUserStore store;
 
-    @PostMapping("/register")
+    @PostMapping(Constants.REGISTER_ENDPOINT)
     public String register(Model model, HttpServletRequest request) {
         String name = request.getParameter("name");
         String pwd = request.getParameter("pwd");
@@ -24,12 +24,8 @@ public class SignupController {
         String city = request.getParameter("city");
         String country = request.getParameter("country");
 
-        if (name == null || name.isEmpty() || email == null || email.isEmpty()) {
-            return "redirect:/";
-        }
-
-        if (!pwd.equals(confirmPwd)) {
-            return "redirect:/";
+        if (name == null || name.isEmpty() || email == null || email.isEmpty() || !pwd.equals(confirmPwd)) {
+            return Constants.INDEX_REDIRECT;
         }
 
         User user = new User(name, email, city, country, pwd);

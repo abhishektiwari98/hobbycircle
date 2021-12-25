@@ -10,12 +10,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Controller to handle user login requests.
+ */
 @Controller
 public class LoginController {
     @Autowired
     InMemoryUserStore store;
 
-    @PostMapping("/login")
+    /**
+     * Handles the login endpoint.
+     * @param model the UI model passed down to the templating engine.
+     * @param request HTTP request from the user.
+     * @return string representing the name of the view in templates.
+     */
+    @PostMapping(Constants.LOGIN_ENDPOINT)
     public String login(Model model, HttpServletRequest request) {
         String email = request.getParameter("email");
         String password = request.getParameter("pwd");
@@ -26,15 +35,15 @@ public class LoginController {
             // setting the session param
             request.getSession().setAttribute(Constants.SESSION_AUTH_KEY, true);
 
-            return "redirect:/home";
+            return Constants.HOME_REDIRECT;
         } else {
-            return "redirect:/";
+            return Constants.INDEX_REDIRECT;
         }
     }
 
-    @RequestMapping("/logout")
+    @RequestMapping(Constants.LOGOUT_ENDPOINT)
     public String logout(Model model, HttpServletRequest request) {
         request.getSession().invalidate();
-        return "redirect:/";
+        return Constants.INDEX_REDIRECT;
     }
 }
