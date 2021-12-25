@@ -1,8 +1,10 @@
 package com.hobbycircle.controller;
 
+import com.google.common.base.Preconditions;
 import com.hobbycircle.common.Constants;
-import com.hobbycircle.common.InMemoryUserStore;
-import com.hobbycircle.common.User;
+import com.hobbycircle.common.Utils;
+import com.hobbycircle.model.User;
+import com.hobbycircle.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class SignupController {
     @Autowired
-    InMemoryUserStore store;
+    UserRepository userRepository;
 
     @PostMapping(Constants.REGISTER_ENDPOINT)
     public String register(Model model, HttpServletRequest request) {
@@ -24,13 +26,31 @@ public class SignupController {
         String city = request.getParameter("city");
         String country = request.getParameter("country");
 
-        if (name == null || name.isEmpty() || email == null || email.isEmpty() || !pwd.equals(confirmPwd)) {
+        if (!validateRequest(name, pwd, confirmPwd, email, city, country)) {
             return Constants.INDEX_REDIRECT;
         }
 
-        User user = new User(name, email, city, country, pwd);
-        store.addNewUser(user);
+        String encryptedPass = Utils.getPasswordHash(pwd);
+        User user = new User(name, email, city, country, encryptedPass);
+        userRepository.save(user);
 
         return Constants.INDEX_PAGE_VIEW_NAME;
+    }
+
+    private boolean validateRequest(String name, String pwd, String cnfPwd, String email, String city, String country) {
+        try {
+            Preconditions.checkArgument(name != null && !name.isEmpty());
+            Preconditions.checkArgument(pwd != null && !pwd.isEmpty());
+            Preconditions.checkArgument(cnfPwd != null && !cnfPwd.isEmpty());
+            Preconditions.checkArgument(email != null && !email.isEmpty());
+            Preconditions.checkArgument(city != null && !city.isEmpty());
+            Preconditions.checkArgument(country != null && !country.isEmpty());
+
+            Preconditions.checkArgument(pwd.equals(cnfPwd));
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -1,18 +1,26 @@
-package com.hobbycircle.common;
+package com.hobbycircle.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class User {
     private String name;
+    @Id
     private String email;
     private String city;
     private String country;
-    private String pwd;
+    private String password;
+
+    public User() {
+    }
 
     public User(String name, String email, String city, String country, String pwd) {
         this.name = name;
         this.email = email;
         this.city = city;
         this.country = country;
-        this.pwd = pwd;
+        this.password = pwd;
     }
 
     public String getName() {
@@ -31,8 +39,8 @@ public class User {
         return country;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getPassword() {
+        return password;
     }
 
 }

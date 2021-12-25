@@ -1,7 +1,10 @@
 package com.hobbycircle.controller;
 
+import com.google.common.base.Preconditions;
 import com.hobbycircle.common.Constants;
-import com.hobbycircle.common.InMemoryUserStore;
+import com.hobbycircle.common.Utils;
+import com.hobbycircle.model.User;
+import com.hobbycircle.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 /**
  * Controller to handle user login requests.
@@ -16,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class LoginController {
     @Autowired
-    InMemoryUserStore store;
+    UserRepository userRepository;
 
     /**
      * Handles the login endpoint.
@@ -29,16 +33,24 @@ public class LoginController {
         String email = request.getParameter("email");
         String password = request.getParameter("pwd");
 
-        boolean result = store.isUserValid(email, password);
+        Preconditions.checkArgument(email != null && !email.isEmpty());
+        Preconditions.checkArgument(password != null && !password.isEmpty());
 
-        if (result) {
-            // setting the session param
-            request.getSession().setAttribute(Constants.SESSION_AUTH_KEY, true);
+        Optional<User> dbResult = userRepository.findById(email);
+        if (dbResult.isPresent()) {
+            User user = dbResult.get();
+            String storedPass = user.getPassword();
+            String encryptedPassword = Utils.getPasswordHash(password);
 
-            return Constants.HOME_REDIRECT;
-        } else {
-            return Constants.INDEX_REDIRECT;
+            if (storedPass.equals(encryptedPassword)) {
+                // setting the session param
+                request.getSession().setAttribute(Constants.SESSION_AUTH_KEY, true);
+
+                return Constants.HOME_REDIRECT;
+            }
         }
+
+        return Constants.INDEX_REDIRECT;
     }
 
     @RequestMapping(Constants.LOGOUT_ENDPOINT)
